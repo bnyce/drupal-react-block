@@ -1,0 +1,8 @@
+react-block:
+  version: 1.x
+  footer: true
+  js:
+    app/build/static/js/main.393e0682.js : {preprocess: 0, minified: false }}
+  css:
+    theme:
+      css/app.css: {}
