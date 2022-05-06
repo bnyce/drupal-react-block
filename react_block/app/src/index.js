@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
 import App from './App';
-//import { fetchAuth } from './features/auth/authSlice'
+import { fetchAuth } from './features/auth/authSlice'
 //import { fetchEvent } from './features/event/eventSlice'
 import { fetchSlrReservation, confirmSlrReservation, expireSlrReservation, resetSlrReservation } from './features/slrReservation/slrReservationSlice'
 import reportWebVitals from './reportWebVitals';

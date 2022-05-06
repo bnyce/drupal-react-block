@@ -4,8 +4,10 @@ const initialState = {
   value: 1,
   status: 'idle',
 };
-export const fetchAuth = createAsyncThunk('auth/fetchAuth', async () => {
-  const response = await fetch('https://library.austintexas.gov/session/token', { 
+//const baseUrl = 'https://library.austintexas.gov';
+const baseUrl = 'http://my-first-drupal9-app.lndo.site';
+export const fetchAuth = createAsyncThunk(baseUrl + 'auth/fetchAuth', async () => {
+  const response = await fetch('/session/token', { 
    // mode: 'cors', 
 })
 
