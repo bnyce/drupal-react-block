@@ -6,8 +6,8 @@ const initialState = {
 };
 //const baseUrl = 'https://library.austintexas.gov';
 const baseUrl = 'http://my-first-drupal9-app.lndo.site';
-export const fetchAuth = createAsyncThunk(baseUrl + 'auth/fetchAuth', async () => {
-  const response = await fetch('/session/token', { 
+export const fetchAuth = createAsyncThunk('auth/fetchAuth', async () => {
+  const response = await fetch(baseUrl + '/session/token', { 
    // mode: 'cors', 
 })
 

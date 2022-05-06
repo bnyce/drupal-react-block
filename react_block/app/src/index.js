@@ -13,7 +13,7 @@ import './index.css';
 const container = document.getElementById('slr_update');
 const root = createRoot(container);
   
-//store.dispatch(fetchAuth());
+store.dispatch(fetchAuth());
 //store.dispatch(fetchEvent());
 store.dispatch(fetchSlrReservation());
 
