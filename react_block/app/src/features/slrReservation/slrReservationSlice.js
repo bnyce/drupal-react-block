@@ -6,14 +6,18 @@ import dayjs from 'dayjs';
 const initLoading = {
   data: {
     meeting_topic: 'loading...',
-    full_name: 'loading...',
-    email: 'loading...',
-    how_many_people_: 'loading...',
-    room: 'loading...',
-    reservation_date: 'loading...',
-    time_start: 'loading...',
-    time_end: 'loading...',
-    status: 'loading...',
+    full_name: '',
+    email: '',
+    how_many_people_: '',
+    room: '',
+    reservation_date: '',
+    time_start: '',
+    time_end: '',
+    status: '6',
+    timer: '11',
+  },
+  entity: {
+      created: ['now']
   }
 }
 const initialState = {
@@ -94,6 +98,11 @@ export function useTimeEnd() {
   const myTime = dayjs(myTimeId).format('h:mm A');
   return myTime;
 }
+export function useTimeCreated() {
+  const myTimeCreated = useSelector((state) => state.slrReservation.value.entity.created[0].value);
+ // const myTime = dayjs(myTimeId).format('h:mm A');
+  return myTimeCreated;
+}
 export function useStatus() {
   const myStatusId = useSelector((state) => state.slrReservation.value.data.status);
 
@@ -109,8 +118,9 @@ export function useStatus() {
         return "Canceled";
       case '5':
         return "Denied";
-      default:
-        return "Awaiting Confirmation";
+      case '6':
+        default:
+        return "Loading...";
     }
   }
   const myStatus = switchResult(myStatusId);
@@ -126,33 +136,75 @@ export const confirmSLR = createAsyncThunk('slrReservation/confirmSlrReservation
   // The value we return becomes the `fulfilled` action payload
   return response.data;
 });
-const baseUrl = 'https://library.austintexas.gov';
+export const expireSLR = createAsyncThunk('slrReservation/expireSlrReservation', async () => {
+  const response = await expireSlrReservation();
+  // The value we return becomes the `fulfilled` action payload
+  return response.data;
+});
+//const baseUrl = 'https://library.austintexas.gov';
+const baseUrl = 'http://my-first-drupal9-app.lndo.site/';
 const webform_id = 'shared_learning_room_reservation';
-const uuid = 'de9d57a5-0295-4c89-a249-b79e20674d8d';
+//const uuid = 'de9d57a5-0295-4c89-a249-b79e20674d8d'; prod
+//const uuid = '49d14d1c-f754-4fdb-8894-e1146d812214';
+
+const pathArray = window.location.href.split('/');
+console.log('pathArray');
+console.log(pathArray);
+const uuid = pathArray[5];
+
+
 const sid = '11504';
 const url = baseUrl + '/webform_rest/' + webform_id + '/submission/' + uuid + '?_format=json';
-const axiosBody = JSON.stringify({
-  'webform_id': webform_id,
-  'uri': ['/webform/webform_id/api'],
-  'status': 2,
+export const resetSlrReservation = createAsyncThunk('slrReservation/resetSlrReservation', async () => {
+  const resetBody = JSON.stringify({
+    'webform_id': webform_id,
+    'uri': ['/webform/webform_id/api'],
+    'status': 1,
+  });
+  const state3 = store.getState();
+  const myToken3 = state3.auth.value;
+  axios.defaults.headers.patch['X-CSRF-TOKEN'] = myToken3;
+  axios.defaults.headers.patch['Content-Type'] = 'application/json';
+  const response = await axios.patch(`${baseUrl}/webform_rest/${webform_id}/submission/${uuid}?_format=json`, resetBody).then((response) => {
+      
+  });
+  //response => response.json();
+    console.log(response);
+    store.dispatch(fetchSlrReservation());
+    return response;
 });
 export const confirmSlrReservation = createAsyncThunk('slrReservation/confirmSlrReservation', async () => {
-  console.log(axiosBody);
+  const confirmBody = JSON.stringify({
+    'webform_id': webform_id,
+    'uri': ['/webform/webform_id/api'],
+    'status': 2,
+  });
   const state = store.getState();
   const myToken = state.auth.value;
   axios.defaults.headers.patch['X-CSRF-TOKEN'] = myToken;
   axios.defaults.headers.patch['Content-Type'] = 'application/json';
-  const response = await axios.patch(`${baseUrl}/webform_rest/${webform_id}/submission/${uuid}?_format=json`, axiosBody).then((response) => {});
+  const response = await axios.patch(`${baseUrl}/webform_rest/${webform_id}/submission/${uuid}?_format=json`, confirmBody).then((response) => {});
+  return response;
+});
+export const expireSlrReservation = createAsyncThunk('slrReservation/expireSlrReservation', async () => {
+  const expireBody = JSON.stringify({
+    'webform_id': webform_id,
+    'uri': ['/webform/webform_id/api'],
+    'status': 3,
+  });
+  const state2 = store.getState();
+  const myToken2 = state2.auth.value;
+  axios.defaults.headers.patch['X-CSRF-TOKEN'] = myToken2;
+  axios.defaults.headers.patch['Content-Type'] = 'application/json';
+  const response = await axios.patch(`${baseUrl}/webform_rest/${webform_id}/submission/${uuid}?_format=json`, expireBody).then((response) => {});
   return response;
 });
 export const fetchSlrReservation = createAsyncThunk('slrReservation/fetchSlrReservation', async () => {
-  console.log(url);
   const response = await fetch(url).then(response => response.json()).catch((error) => {
     console.log(error)
   });
-  console.log(response);
   return response;
-})
+});
 const slrReservationSlice = createSlice({
   name: 'slrReservation',
   initialState,
@@ -161,6 +213,17 @@ const slrReservationSlice = createSlice({
     builder.addCase(fetchSlrReservation.fulfilled, (state, action) => {
       state.status = 'idle';
       state.value = action.payload;
+      state.value.data.timer = '10';
+    }).addCase(expireSlrReservation.fulfilled, (state, action) => {
+      state.status = 'idle';
+      state.value.data.status = '3';
+    }).addCase(confirmSlrReservation.fulfilled, (state, action) => {
+      state.status = 'idle';
+      state.value.data.status = '2';
+    }).addCase(resetSlrReservation.fulfilled, (state, action) => {
+      state.status = 'idle';
+      //state.value = action.payload;
+      //state.value.data.status = '1';
     })
   }
 })

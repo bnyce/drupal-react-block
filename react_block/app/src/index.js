@@ -5,23 +5,27 @@ import { store } from './app/store';
 import App from './App';
 //import { fetchAuth } from './features/auth/authSlice'
 //import { fetchEvent } from './features/event/eventSlice'
-import { fetchSlrReservation, confirmSlrReservation } from './features/slrReservation/slrReservationSlice'
+import { fetchSlrReservation, confirmSlrReservation, expireSlrReservation, resetSlrReservation } from './features/slrReservation/slrReservationSlice'
 import reportWebVitals from './reportWebVitals';
 import './index.css';
 
-const container = document.getElementById('ReactBlock');
+
+const container = document.getElementById('slr_update');
 const root = createRoot(container);
   
 //store.dispatch(fetchAuth());
 //store.dispatch(fetchEvent());
-
 store.dispatch(fetchSlrReservation());
-setTimeout(function(){store.dispatch(confirmSlrReservation())}, 1000);
+
+//store.dispatch(fetchSlrReservation());
+//setTimeout(function(){store.dispatch(resetSlrReservation())}, 1000);
+//setTimeout(function(){store.dispatch(fetchSlrReservation())}, 5000);
+//store.dispatch(expireSlrReservation());
 
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <App />
+    <Provider store={store}>   
+          <App />
     </Provider>
   </React.StrictMode>
 );
